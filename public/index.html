@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Genesis</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="./assets/web3.min.js"></script>
+    <script src="./script.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+    <script src='https://bundle.run/buffer@5.2.1'></script>
+    <script src="https://unpkg.com/ipfs-api@9.0.0/dist/index.js"
+    integrity="sha384-5bXRcW9kyxxnSMbOoHzraqa7Z0PQWIao+cgeg327zit1hz5LZCEbIMx/LWKPReuB"
+    crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="buttons-box">
+        <div>
+            <button id="LastTx">Last Transaction XXXX</button>
+            <button onclick="loadWeb3()" id="ConnectMetaMaskBtn">Connect MetaMask</button>
+            <button onclick="disconnectWeb3()" id="DisconnectMetaMaskBtn" style="visibility: hidden;">Disconnect</button>
+        </div>
+    </div>
+    <div class="full-container">
+        <div class="column column1">
+            <div class="box">
+                <h2>Total Supply: <span id="TSupply1" class="number">XX</span></h2>
+                <video width="250" height="250" controls autoplay controlslist="nodownload" loop muted src="https://storage.opensea.io/files/26d3962934177440e54e3bb1f2ed06c8.mp4"> 
+                  </video>
+                <h3><span id="suuply1" class="number">XX</span> left</h3>
+                <div class="sub-main">
+                    <button class="button-two" onclick="get1()" id="get1Btn"><h4><span>Get</span></h4></button>
+                </div>
+                <h1>Owners</h1>
+                <ul id="owner1List" class="list-numbered list-numbered-1">
+                    <span style="text-align: center;">Please Connect METAMASK to Load Values</span>
+                </ul>
+            </div> 
+        </div>
+        <div class="hexdots" style="visibility: hidden;">
+            <h1 class="loading-heading">M I N T I N G</h1>
+            <div class="hexdots-loader"> </div>
+        </div>
+        <div class="column column2">
+            <div class="box">
+                <h2>Total Supply: <span id="TSupply2" class="number">XX</span></h2>
+                <div class="image-upload">
+                    <label for="file-input">
+                        <img id="previewImg" src="./images/upload-photo-icon-21.jpeg"
+                            width="250px" height="250px"/>
+                            <input id="file-input" type="file" onchange="previewFile(this);" style="display: none;" />
+                    </label>
+                </div>
+                <h3><span id="suuply2" class="number">XX </span> left</span></h3>
+                <div class="sub-main">
+                    <button onclick="get2()" id="get2Btn" class="button-two"><h4><span>Get</span></h4></button>
+                </div>
+                <h1>Owners</h1>
+                <ul id="owner2List" class="list-numbered list-numbered-2" >
+                    <span>Please Connect METAMASK to Load Values</span>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+    var names;
+        function previewFile(input) {
+                var file = $("input[type=file]").get(0).files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        $("#previewImg").attr("src", reader.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        if(typeof window.ethereum== 'undefined'){
+            var btn=document.getElementById('ConnectMetaMaskBtn')
+            btn.innerHTML="<a href='https://metamask.io/' class='zocial bitcoin' target= _blank>Install MetaMask</a>"
+        }
+        async function loadWeb3(){
+            if(window.ethereum){
+                window.web3=new Web3(window.ethereum)
+                await window.ethereum.enable()   
+                var disBtn=document.getElementById('DisconnectMetaMaskBtn')
+                disBtn.style.visibility="visible"
+                var btn=document.getElementById('ConnectMetaMaskBtn')
+                var accounts=await window.web3.eth.getAccounts();
+                btn.innerHTML=`Connected ${accounts[0]} MetaMask`
+                console.log('Web3loadded')
+            }
+            var loader = document.querySelector('.hexdots')
+                var text = document.querySelector('.loading-heading')
+                text.textContent="L O A D I N G"
+                loader.style.visibility = "visible"
+                await loadValues();
+                loader.style.visibility = "hidden"
+            console.log('Values loaded')
+        }
+        async function disconnectWeb3(){
+            location.reload();
+        }
+        function createListItem(text){    
+            var li =document.createElement('li')
+            li.innerHTML=`<a href="https://testnets.opensea.io/assets/0x5cE35863BB6Ac2d6a8E7F69371C15aFA59AB4161/${text[0]}"  target= _blank>${text[1]}</a>`
+            return li;
+        }   
+        async function getName() {
+            var name=""
+            while(name=="")
+            name =await window.prompt('Please Enter Your Name as Owner')
+            return name
+        }
+        async function get1(){
+            if(!window.web3.eth){
+                window.alert('Please first connect MetaMask')
+                return;
+            }
+            var name = await getName()
+            if(name){
+                var loader = document.querySelector('.hexdots')
+                var text = document.querySelector('.loading-heading')
+                text.textContent="M I N T I N G"
+                loader.style.visibility = "visible"
+                console.log(name)
+                names=name;
+                const accounts=await window.web3.eth.getAccounts()
+                try{
+                    let trans=await window.contract.methods.mint(1,name,"https://ipfs.io/ipfs/QmbzyPYgby3WBi12aPcc8mhFYHgtXvk2cS6A6k6i7LjeLq?filename=MySubsNFT.json").send({from:accounts[0]});
+                    console.log(trans)
+                    var TxBtn = document.getElementById('LastTx')
+                    TxBtn.innerHTML=`<a href="https://rinkeby.etherscan.io/tx/${trans.transactionHash}" target= _blank>Last Transaction ${trans.transactionHash}</a>`
+                    text.textContent="L O A D I N G"
+                    await loadValues()
+                    loader.style.visibility = "hidden"
+                    window.alert('Contratulations Minted 🥳 ')
+                }
+                catch(e){
+                    loader.style.visibility = "hidden"
+                    window.alert('Transaction Rejected')
+                }
+                
+            }
+        }
+        function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function JsonToArray (json)
+{
+	
+	return new Promise((resolve,reject)=>{
+    var str = JSON.stringify(json, null, 0);
+	var ret = new Uint8Array(str.length);
+	for (var i = 0; i < str.length; i++) {
+		ret[i] = str.charCodeAt(i);
+	}
+        resolve(ret)
+    })
+};
+        async function upload() {
+          let reader = new FileReader();
+          let photo = $("input[type=file]").get(0).files[0];
+          console.log(photo)
+          reader.readAsArrayBuffer(photo); // Read Provided File
+          console.log('aaa')
+          await sleep(3000)
+          const ipfs = window.IpfsApi({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) // Connect to IPFS
+            console.log('ipfs',ipfs)
+            let buf = buffer.Buffer(reader.result)
+            console.log(buf) // Convert data into buffer
+           const addPhoto=async function (){
+               return new Promise((resolve)=>{
+                let ipfsURI;
+            ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
+              if(err) {
+                console.error(err)
+                return null
+              }
+              ipfsURI = `https://ipfs.io/ipfs/${result[0].hash}`
+              console.log(ipfsURI)
+              resolve(ipfsURI)
+              
+            }) 
+               })
+           } 
+            
+        return new Promise(async function (resolve, reject){
+            var ipfsURI=await addPhoto()
+            let metadata={
+                name:`Thank You ${names} for Subscribing ❤️`,
+                description:`This NFT is souvenir for all my lovely subscribers. Welcome to the family - Abhinav Singh`,
+                image:ipfsURI,
+                attributes:[]
+            }
+            ipfs.files.add(buffer.Buffer.from(JSON.stringify(metadata)), (err, result) => { // Upload buffer to IPFS
+              if(err) {
+                console.error(err)
+                return null
+              }
+              let finalIpfsURI = `https://ipfs.io/ipfs/${result[0].hash}`
+              console.log(finalIpfsURI)
+              resolve(finalIpfsURI)    
+            })
+});
+        }
+        async function get2(){
+            if(!window.web3.eth){
+                window.alert('Please first connect MetaMask')
+                return;
+            }
+            var name = await getName()
+            if(name){
+                var loader = document.querySelector('.hexdots')
+                var text = document.querySelector('.loading-heading')
+                text.textContent="L O A D I N G"
+                loader.style.visibility = "visible"
+                console.log(name)
+                names=name;
+                const accounts=await window.web3.eth.getAccounts()
+                try{
+                    text.innerHTML="U P L O A D I N G<br>&emsp;T O &emsp;I P F S"
+                    let ipfsURI =await upload()
+                    console.log(ipfsURI)
+                    if(ipfsURI){
+                    text.textContent="M I N T I N G"
+                    let trans=await window.contract.methods.mint(2,name,ipfsURI).send({from:accounts[0]});
+                    console.log(trans)
+                    var TxBtn = document.getElementById('LastTx')
+                    TxBtn.innerHTML=`<a href="https://rinkeby.etherscan.io/tx/${trans.transactionHash}" target= _blank>Last Transaction ${trans.transactionHash}</a>`
+                    var text = document.querySelector('.loading-heading')
+                    text.textContent="L O A D I N G"
+                    await loadValues()
+                    loader.style.visibility = "hidden"
+                    window.alert('Contratulations Minted 🥳 ')}
+                    else{
+                        window.alert('OOPS Could not upload file.. Please try again')
+                        loader.style.visibility = "hidden"
+                    }
+                }
+                catch(e){
+                    console.log(e)
+                    loader.style.visibility = "hidden"
+                    window.alert('Transaction Rejected')
+                }
+            }
+        }
+        
+      </script>
+</body>
+</html>
